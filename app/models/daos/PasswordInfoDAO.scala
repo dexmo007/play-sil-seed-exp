@@ -15,12 +15,12 @@ class PasswordInfoDAO @Inject()(@NamedDatabase("users") protected val dbConfigPr
 
   import driver.api._
 
-  override type Wrapper = DBPasswordInfo
+  override type DBWrapper = DBPasswordInfo
   override type DBTable = PasswordInfoTable
 
   override def wrap(t: PasswordInfo, loginInfoId: Long) =
     DBPasswordInfo(t.hasher, t.password, t.salt, loginInfoId)
-  
+
   override def updateAction(loginInfo: LoginInfo, authInfo: PasswordInfo) =
     subQuery(loginInfo)
       .map(info => (info.hasher, info.password, info.salt))

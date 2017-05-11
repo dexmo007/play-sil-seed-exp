@@ -27,15 +27,15 @@ trait AbstractDelegableAuthInfoDAO[T <: AuthInfo] extends DelegableAuthInfoDAO[T
 
   val loginInfoDAO: LoginInfoDAO
 
-  type Wrapper <: IdWrapper[T]
+  type DBWrapper <: IdWrapper[T]
 
-  type DBTable <: Table[Wrapper] with IdWrappedTable[Wrapper]
+  type DBTable <: Table[DBWrapper] with IdWrappedTable[DBWrapper]
 
-  val tableQuery = TableQuery[DBTable]
+  protected val tableQuery = TableQuery[DBTable]
 
-  def wrap(t: T, loginInfoId: Long): Wrapper
+  def wrap(t: T, loginInfoId: Long): DBWrapper
 
-  private def query(loginInfo: LoginInfo) = for {
+  protected def query(loginInfo: LoginInfo) = for {
     li <- loginInfoDAO.query(loginInfo)
     ai <- tableQuery if ai.loginInfoId === li.id
   } yield ai

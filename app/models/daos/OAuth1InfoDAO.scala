@@ -15,7 +15,7 @@ class OAuth1InfoDAO @Inject()(@NamedDatabase("users") protected val dbConfigProv
 
   import driver.api._
 
-  override type Wrapper = DBOAuth1Info
+  override type DBWrapper = DBOAuth1Info
   override type DBTable = OAuth1InfoTable
 
   override def wrap(t: OAuth1Info, id: Long): DBOAuth1Info =

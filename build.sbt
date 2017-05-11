@@ -24,6 +24,7 @@ libraryDependencies ++= Seq(
   "com.mohiva" %% "play-silhouette-testkit" % "4.0.0" % "test",
   "com.typesafe.play" %% "play-slick" % "1.0.1",
   "com.typesafe.play" %% "play-slick-evolutions" % "1.0.1",
+  "be.objectify" %% "deadbolt-scala" % "2.5.1",
   specs2 % Test,
   cache,
   filters
