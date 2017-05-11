@@ -9,11 +9,12 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
-  * Created by henri on 5/11/2017.
-  */
-class OpenIDInfoDAO @Inject()(@NamedDatabase("users") protected val dbConfigProvider: DatabaseConfigProvider, val loginInfoDAO: LoginInfoDAO)
+ * Created by henri on 5/11/2017.
+ */
+class OpenIDInfoDAO @Inject() (@NamedDatabase("users") protected val dbConfigProvider: DatabaseConfigProvider, val loginInfoDAO: LoginInfoDAO)
   extends DelegableAuthInfoDAO[OpenIDInfo] with DAO {
 
   import driver.api._
@@ -64,9 +65,9 @@ class OpenIDInfoDAO @Inject()(@NamedDatabase("users") protected val dbConfigProv
   override def save(loginInfo: LoginInfo, authInfo: OpenIDInfo): Future[OpenIDInfo] = db.run(
     loginInfoDAO.query(loginInfo).joinLeft(openIDInfoTable).on(_.id === _.loginInfoId)
       .result.head.flatMap {
-      case (_, Some(_)) => updateAction(loginInfo, authInfo)
-      case (_, None) => addAction(loginInfo, authInfo)
-    }
+        case (_, Some(_)) => updateAction(loginInfo, authInfo)
+        case (_, None) => addAction(loginInfo, authInfo)
+      }
   ).map(_ => authInfo)
 
   override def remove(loginInfo: LoginInfo): Future[Unit] = {
@@ -77,26 +78,26 @@ class OpenIDInfoDAO @Inject()(@NamedDatabase("users") protected val dbConfigProv
     db.run((openIDInfoSubQuery.delete andThen attributeSubQuery.delete).transactionally).map(_ => ())
   }
 
-  case class DBOpenIDInfo(id: String,
-                          loginInfoId: Long) extends IdWrapper[OpenIDInfo] {
-    override def unwrap: OpenIDInfo = OpenIDInfo(id, Map.empty)
-  }
+  case class DBOpenIDInfo(
+    id: String,
+    loginInfoId: Long)
 
-  class OpenIDInfoTable(tag: Tag) extends Table[DBOpenIDInfo](tag, "openidinfo") with IdWrappedTable[DBOpenIDInfo] {
+  class OpenIDInfoTable(tag: Tag) extends Table[DBOpenIDInfo](tag, "openid_info") {
     def id = column[String]("id", O.PrimaryKey)
 
-    def loginInfoId = column[Long]("logininfoid")
+    def loginInfoId = column[Long]("login_info_id")
 
     def * = (id, loginInfoId) <> (DBOpenIDInfo.tupled, DBOpenIDInfo.unapply)
   }
 
   private val openIDInfoTable = TableQuery[OpenIDInfoTable]
 
-  case class DBOpenIDAttribute(id: String,
-                               key: String,
-                               value: String)
+  case class DBOpenIDAttribute(
+    id: String,
+    key: String,
+    value: String)
 
-  class OpenIDAttributeTable(tag: Tag) extends Table[DBOpenIDAttribute](tag, "openidattributes") {
+  class OpenIDAttributeTable(tag: Tag) extends Table[DBOpenIDAttribute](tag, "openid_attributes") {
     def id = column[String]("id")
 
     def key = column[String]("key")

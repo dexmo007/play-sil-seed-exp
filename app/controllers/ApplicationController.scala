@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
+import be.objectify.deadbolt.scala.{ AuthenticatedRequest, DeadboltActions }
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 import play.api.i18n.{ I18nSupport, MessagesApi }
@@ -13,14 +14,15 @@ import scala.concurrent.Future
 /**
  * The basic application controller.
  *
- * @param messagesApi The Play messages API.
- * @param silhouette The Silhouette stack.
+ * @param messagesApi            The Play messages API.
+ * @param silhouette             The Silhouette stack.
  * @param socialProviderRegistry The social provider registry.
- * @param webJarAssets The webjar assets implementation.
+ * @param webJarAssets           The webjar assets implementation.
  */
 class ApplicationController @Inject() (
   val messagesApi: MessagesApi,
   silhouette: Silhouette[DefaultEnv],
+  deadboltActions: DeadboltActions,
   socialProviderRegistry: SocialProviderRegistry,
   implicit val webJarAssets: WebJarAssets)
   extends Controller with I18nSupport {
@@ -31,8 +33,13 @@ class ApplicationController @Inject() (
    * @return The result to display.
    */
   def index = silhouette.SecuredAction.async { implicit request =>
+    implicit val authRequest = new AuthenticatedRequest(request, Some(request.identity))
     Future.successful(Ok(views.html.home(request.identity)))
   }
+
+  //  def i = deadboltActions.SubjectPresent()() { implicit request =>
+  //    Future.successful(Ok(views.html.home(request.identity)))
+  //  }
 
   /**
    * Handles the Sign Out action.

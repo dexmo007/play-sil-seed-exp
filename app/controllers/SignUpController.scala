@@ -9,7 +9,7 @@ import com.mohiva.play.silhouette.api.services.AvatarService
 import com.mohiva.play.silhouette.api.util.PasswordHasherRegistry
 import com.mohiva.play.silhouette.impl.providers._
 import forms.SignUpForm
-import models.User
+import models.HQUser
 import models.services.{ AuthTokenService, UserService }
 import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import play.api.libs.concurrent.Execution.Implicits._
@@ -78,15 +78,14 @@ class SignUpController @Inject() (
             Future.successful(result)
           case None =>
             val authInfo = passwordHasherRegistry.current.hash(data.password)
-            val user = User(
+            val user = HQUser(
               userID = UUID.randomUUID(),
               loginInfo = loginInfo,
-              firstName = Some(data.firstName),
-              lastName = Some(data.lastName),
-              fullName = Some(data.firstName + " " + data.lastName),
-              email = Some(data.email),
+              nickname = data.firstName,
+              email = data.email,
               avatarURL = None,
-              activated = false
+              activated = false,
+              extraRoles = Nil
             )
             for {
               avatar <- avatarService.retrieveURL(data.email)

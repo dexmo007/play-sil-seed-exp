@@ -1,8 +1,8 @@
-@(user: User, url: String)(implicit messages: Messages)
+@(user: HQUser, url: String)(implicit messages: Messages)
 
 <html>
     <body>
-        <p>@messages("email.sign.up.hello", user.name.getOrElse("user"))</p>
+        <p>@messages("email.sign.up.hello", user.nickname)</p>
         <p>@Html(messages("email.sign.up.html.text", url))</p>
     </body>
 </html>

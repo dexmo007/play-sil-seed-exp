@@ -5,8 +5,8 @@ import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.providers.CommonSocialProfile
-import models.User
-import models.daos.UserDAO
+import models.HQUser
+import models.daos.HQUserDAO
 import play.api.libs.concurrent.Execution.Implicits._
 
 import scala.concurrent.Future
@@ -16,7 +16,7 @@ import scala.concurrent.Future
  *
  * @param userDAO The user DAO implementation.
  */
-class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
+class UserServiceImpl @Inject() (userDAO: HQUserDAO) extends UserService {
 
   /**
    * Retrieves a user that matches the specified ID.
@@ -32,7 +32,7 @@ class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
    * @param loginInfo The login info to retrieve a user.
    * @return The retrieved user or None if no user could be retrieved for the given login info.
    */
-  def retrieve(loginInfo: LoginInfo): Future[Option[User]] = userDAO.find(loginInfo)
+  def retrieve(loginInfo: LoginInfo): Future[Option[HQUser]] = userDAO.find(loginInfo)
 
   /**
    * Saves a user.
@@ -40,7 +40,7 @@ class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
    * @param user The user to save.
    * @return The saved user.
    */
-  def save(user: User) = userDAO.save(user)
+  def save(user: HQUser) = userDAO.save(user)
 
   /**
    * Saves the social profile for a user.
@@ -50,26 +50,25 @@ class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
    * @param profile The social profile to save.
    * @return The user for whom the profile was saved.
    */
+  // todo ensure there is an email and some sort of name, otherwise error -> rethink UserService trait!!
   def save(profile: CommonSocialProfile) = {
     userDAO.find(profile.loginInfo).flatMap {
       case Some(user) => // Update user with profile
         userDAO.save(user.copy(
-          firstName = profile.firstName,
-          lastName = profile.lastName,
-          fullName = profile.fullName,
-          email = profile.email,
+          nickname = profile.fullName.getOrElse("anon" + user.identifier),
+          email = profile.email.getOrElse("unknown"),
           avatarURL = profile.avatarURL
         ))
       case None => // Insert a new user
-        userDAO.save(User(
-          userID = UUID.randomUUID(),
+        val uuid = UUID.randomUUID()
+        userDAO.save(HQUser(
+          userID = uuid,
           loginInfo = profile.loginInfo,
-          firstName = profile.firstName,
-          lastName = profile.lastName,
-          fullName = profile.fullName,
-          email = profile.email,
+          nickname = profile.fullName.getOrElse("anon" + uuid.toString),
+          email = profile.email.getOrElse("unknown"),
           avatarURL = profile.avatarURL,
-          activated = true
+          activated = true,
+          extraRoles = Nil
         ))
     }
   }

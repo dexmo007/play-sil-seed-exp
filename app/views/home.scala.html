@@ -1,4 +1,8 @@
-@(user: models.User)(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
+@import be.objectify.deadbolt.scala.views.html.subjectPresent
+@import be.objectify.deadbolt.scala.views.html.restrictOr
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+
+@(user: models.HQUser)(implicit request: AuthenticatedRequest[Any], messages: Messages, webJarAssets: WebJarAssets)
 
 @main(Messages("home.title"), Some(user)) {
     <div class="user col-md-6 col-md-offset-3">
@@ -12,18 +16,32 @@
         </div>
         <div class="row data">
             <div class="col-md-12">
+                @*<div class="row">*@
+                @*<p class="col-md-6"><strong>@Messages("first.name"):</strong></p><p class="col-md-6">@user.firstName.getOrElse("None")</p>*@
+                @*</div>*@
+                @*<div class="row">*@
+                @*<p class="col-md-6"><strong>@Messages("last.name"):</strong></p><p class="col-md-6">@user.lastName.getOrElse("None")</p>*@
+                @*</div>*@
                 <div class="row">
-                    <p class="col-md-6"><strong>@Messages("first.name"):</strong></p><p class="col-md-6">@user.firstName.getOrElse("None")</p>
+                    <p class="col-md-6"><strong>@Messages("full.name"):</strong></p><p class="col-md-6">@user.nickname</p>
                 </div>
                 <div class="row">
-                    <p class="col-md-6"><strong>@Messages("last.name"):</strong></p><p class="col-md-6">@user.lastName.getOrElse("None")</p>
+                    <p class="col-md-6"><strong>@Messages("email"):</strong></p><p class="col-md-6">@user.email</p>
                 </div>
-                <div class="row">
-                    <p class="col-md-6"><strong>@Messages("full.name"):</strong></p><p class="col-md-6">@user.fullName.getOrElse("None")</p>
-                </div>
-                <div class="row">
-                    <p class="col-md-6"><strong>@Messages("email"):</strong></p><p class="col-md-6">@user.email.getOrElse("None")</p>
-                </div>
+                @subjectPresent() {
+                    <div class="row">
+                        <p class="col-md-6"><strong>Subject:</strong></p><p class="col-md-6">Subject is present</p>
+                    </div>
+                }
+                @restrictOr(roles = Roles.Superuser.group) {
+                    <div class="row">
+                        <p class="col-md-6"><strong>Superuser:</strong></p><p class="col-md-6">yes</p>
+                    </div>
+                } {
+                    <div class="row">
+                        <p class="col-md-6"><strong>Superuser:</strong></p><p class="col-md-6">no</p>
+                    </div>
+                }
             </div>
         </div>
     </div>

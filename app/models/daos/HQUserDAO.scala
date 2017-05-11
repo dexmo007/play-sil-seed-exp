@@ -4,13 +4,14 @@ import java.util.UUID
 
 import be.objectify.deadbolt.scala.models.Role
 import com.mohiva.play.silhouette.api.LoginInfo
-import models.{HQUser, Roles}
+import models.{ HQUser, Roles }
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
-  * Created by henri on 5/11/2017.
-  */
+ * Created by henri on 5/11/2017.
+ */
 trait HQUserDAO extends DAO {
 
   import driver.api._
@@ -32,43 +33,44 @@ trait HQUserDAO extends DAO {
   }
 
   /**
-    * Finds a user by its login info.
-    *
-    * @param loginInfo The login info of the user to find.
-    * @return The found user or None if no user for the given login info could be found.
-    */
+   * Finds a user by its login info.
+   *
+   * @param loginInfo The login info of the user to find.
+   * @return The found user or None if no user for the given login info could be found.
+   */
   def find(loginInfo: LoginInfo): Future[Option[HQUser]]
 
   /**
-    * Finds a user by its user ID.
-    *
-    * @param userID The ID of the user to find.
-    * @return The found user or None if no user for the given ID could be found.
-    */
+   * Finds a user by its user ID.
+   *
+   * @param userID The ID of the user to find.
+   * @return The found user or None if no user for the given ID could be found.
+   */
   def find(userID: UUID): Future[Option[HQUser]]
 
   /**
-    * Saves a user.
-    *
-    * @param user The user to save.
-    * @return The saved user.
-    */
+   * Saves a user.
+   *
+   * @param user The user to save.
+   * @return The saved user.
+   */
   def save(user: HQUser): Future[HQUser]
 
-  case class DBHQUser(userID: String,
-                      nickname: String,
-                      email: String,
-                      avatarURL: Option[String],
-                      activated: Boolean)
+  case class DBHQUser(
+    userID: String,
+    nickname: String,
+    email: String,
+    avatarURL: Option[String],
+    activated: Boolean)
 
-  class HQUserTable(tag: Tag) extends Table[DBHQUser](tag, "user") {
-    def id = column[String]("userID", O.PrimaryKey)
+  class HQUserTable(tag: Tag) extends Table[DBHQUser](tag, "hq_user") {
+    def id = column[String]("user_id", O.PrimaryKey)
 
     def nickname = column[String]("nickname")
 
-    def email = column[Option[String]]("email")
+    def email = column[String]("email")
 
-    def avatarURL = column[Option[String]]("avatarURL")
+    def avatarURL = column[Option[String]]("avatar_url")
 
     def activated = column[Boolean]("activated")
 
@@ -79,10 +81,10 @@ trait HQUserDAO extends DAO {
 
   case class DBUserLoginInfo(userID: String, loginInfoId: Long)
 
-  class UserLoginInfoTable(tag: Tag) extends Table[DBUserLoginInfo](tag, "userlogininfo") {
-    def userID = column[String]("userID")
+  class UserLoginInfoTable(tag: Tag) extends Table[DBUserLoginInfo](tag, "user_login_info") {
+    def userID = column[String]("user_id")
 
-    def loginInfoId = column[Long]("loginInfoId")
+    def loginInfoId = column[Long]("login_info_id")
 
     def * = (userID, loginInfoId) <> (DBUserLoginInfo.tupled, DBUserLoginInfo.unapply)
   }
@@ -90,8 +92,8 @@ trait HQUserDAO extends DAO {
   protected val userLoginInfoTable = TableQuery[UserLoginInfoTable]
 
   /**
-    * Table that contains all the superusers' IDs
-    */
+   * Table that contains all the superusers' IDs
+   */
   class SuperuserTable(tag: Tag) extends Table[(Long, String)](tag, "hq_superuser") {
 
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)

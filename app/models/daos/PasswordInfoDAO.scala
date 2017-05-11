@@ -7,16 +7,20 @@ import com.mohiva.play.silhouette.api.util.PasswordInfo
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
-  * Created by henri on 5/10/2017.
-  */
-class PasswordInfoDAO @Inject()(@NamedDatabase("users") protected val dbConfigProvider: DatabaseConfigProvider, val loginInfoDAO: LoginInfoDAO)
+ * Created by henri on 5/10/2017.
+ */
+class PasswordInfoDAO @Inject() (@NamedDatabase("users") protected val dbConfigProvider: DatabaseConfigProvider, val loginInfoDAO: LoginInfoDAO)
   extends AbstractDelegableAuthInfoDAO[PasswordInfo] with DAO {
 
   import driver.api._
 
   override type DBWrapper = DBPasswordInfo
   override type DBTable = PasswordInfoTable
+
+  override protected val tableQuery = TableQuery[PasswordInfoTable]
 
   override def wrap(t: PasswordInfo, loginInfoId: Long) =
     DBPasswordInfo(t.hasher, t.password, t.salt, loginInfoId)
@@ -68,25 +72,28 @@ class PasswordInfoDAO @Inject()(@NamedDatabase("users") protected val dbConfigPr
   //  override def remove(loginInfo: LoginInfo) =
   //    db.run(subQuery(loginInfo).delete).map(_ => ())
 
-  case class DBPasswordInfo(hasher: String,
-                            password: String,
-                            salt: Option[String],
-                            loginInfoId: Long) {
+  case class DBPasswordInfo(
+    hasher: String,
+    password: String,
+    salt: Option[String],
+    loginInfoId: Long) extends IdWrapper[PasswordInfo] {
     def unwrap = PasswordInfo(hasher, password, salt)
+
+    override def id: Option[Long] = None
   }
 
-  class PasswordInfoTable(tag: Tag) extends Table[DBPasswordInfo](tag, "passwordinfo") {
+  class PasswordInfoTable(tag: Tag) extends Table[DBPasswordInfo](tag, "password_info") with IdWrappedTable {
     def hasher = column[String]("hasher")
 
     def password = column[String]("password")
 
     def salt = column[Option[String]]("salt")
 
-    def loginInfoId = column[Long]("loginInfoId")
+    def loginInfoId = column[Long]("login_info_id")
 
     def * = (hasher, password, salt, loginInfoId) <> (DBPasswordInfo.tupled, DBPasswordInfo.unapply)
   }
 
-  val passwordInfos = TableQuery[PasswordInfoTable]
+  //  val passwordInfos = TableQuery[PasswordInfoTable]
 
 }

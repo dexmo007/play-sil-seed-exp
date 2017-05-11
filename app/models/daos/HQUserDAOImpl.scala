@@ -4,16 +4,17 @@ import java.util.UUID
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.LoginInfo
-import models.{HQUser, Roles}
+import models.{ HQUser, Roles }
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
-  * Created by henri on 5/11/2017.
-  */
-class HQUserDAOImpl @Inject()(@NamedDatabase("users") protected val dbConfigProvider: DatabaseConfigProvider, loginInfoDAO: LoginInfoDAO) extends HQUserDAO {
+ * Created by henri on 5/11/2017.
+ */
+class HQUserDAOImpl @Inject() (@NamedDatabase("users") protected val dbConfigProvider: DatabaseConfigProvider, loginInfoDAO: LoginInfoDAO) extends HQUserDAO {
 
   import driver.api._
 
@@ -29,11 +30,11 @@ class HQUserDAOImpl @Inject()(@NamedDatabase("users") protected val dbConfigProv
     })
 
   /**
-    * Finds a user by its login info.
-    *
-    * @param loginInfo The login info of the user to find.
-    * @return The found user or None if no user for the given login info could be found.
-    */
+   * Finds a user by its login info.
+   *
+   * @param loginInfo The login info of the user to find.
+   * @return The found user or None if no user for the given login info could be found.
+   */
   override def find(loginInfo: LoginInfo): Future[Option[HQUser]] = {
     val query = for {
       dbLoginInfo <- loginInfoDAO.query(loginInfo)
@@ -48,11 +49,11 @@ class HQUserDAOImpl @Inject()(@NamedDatabase("users") protected val dbConfigProv
   }
 
   /**
-    * Finds a user by its user ID.
-    *
-    * @param userID The ID of the user to find.
-    * @return The found user or None if no user for the given ID could be found.
-    */
+   * Finds a user by its user ID.
+   *
+   * @param userID The ID of the user to find.
+   * @return The found user or None if no user for the given ID could be found.
+   */
   override def find(userID: UUID): Future[Option[HQUser]] = {
     val query = for {
       dbUser <- hQUserTable.filter(_.id === userID.toString)
@@ -61,7 +62,8 @@ class HQUserDAOImpl @Inject()(@NamedDatabase("users") protected val dbConfigProv
     } yield (dbUser, dbLoginInfo)
     db.run(query.result.headOption) foMap {
       case (user, loginInfo) => findRoles(user.userID) map { roles =>
-        HQUser(UUID.fromString(user.userID),
+        HQUser(
+          UUID.fromString(user.userID),
           LoginInfo(loginInfo.providerID, loginInfo.providerKey),
           user.nickname, user.email, user.avatarURL, user.activated, roles)
       }
@@ -69,11 +71,11 @@ class HQUserDAOImpl @Inject()(@NamedDatabase("users") protected val dbConfigProv
   }
 
   /**
-    * Saves a user.
-    *
-    * @param user The user to save.
-    * @return The saved user.
-    */
+   * Saves a user.
+   *
+   * @param user The user to save.
+   * @return The saved user.
+   */
   override def save(user: HQUser): Future[HQUser] = {
     val dbUser = DBHQUser(user.userID.toString, user.nickname, user.email, user.avatarURL, user.activated)
     val dbLoginInfo = loginInfoDAO.DBLoginInfo(None, user.loginInfo.providerID, user.loginInfo.providerKey)

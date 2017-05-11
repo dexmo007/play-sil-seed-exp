@@ -4,10 +4,11 @@ import play.api.db.slick.HasDatabaseConfigProvider
 import slick.driver.JdbcProfile
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
-  * Created by henri on 5/10/2017.
-  */
+ * Created by henri on 5/10/2017.
+ */
 trait DAO extends HasDatabaseConfigProvider[JdbcProfile] {
 
   implicit class FutureOption[T](fo: Future[Option[T]]) {

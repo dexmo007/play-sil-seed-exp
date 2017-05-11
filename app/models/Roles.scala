@@ -1,12 +1,12 @@
 package models
 
-import be.objectify.deadbolt.scala.{RoleGroups, allOf, allOfGroup, anyOf}
+import be.objectify.deadbolt.scala.{ RoleGroups, allOf, allOfGroup, anyOf }
 
 /**
-  * The roles that exist for DexmoHQ
-  *
-  * @author Henrik Drefs
-  */
+ * The roles that exist for DexmoHQ
+ *
+ * @author Henrik Drefs
+ */
 object Roles {
 
   sealed trait Role extends be.objectify.deadbolt.scala.models.Role {

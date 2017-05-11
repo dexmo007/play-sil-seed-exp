@@ -22,8 +22,12 @@ libraryDependencies ++= Seq(
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.5.0-akka-2.4.x",
   "com.adrianhurt" %% "play-bootstrap" % "1.0-P25-B3",
   "com.mohiva" %% "play-silhouette-testkit" % "4.0.0" % "test",
+  // database
+  "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
   "com.typesafe.play" %% "play-slick" % "1.0.1",
   "com.typesafe.play" %% "play-slick-evolutions" % "1.0.1",
+  "com.github.tototoshi" %% "slick-joda-mapper" % "2.2.0",
+  // deadbolt
   "be.objectify" %% "deadbolt-scala" % "2.5.1",
   specs2 % Test,
   cache,
