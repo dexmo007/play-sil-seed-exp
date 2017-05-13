@@ -9,7 +9,7 @@ import be.objectify.deadbolt.scala.{ RoleGroups, allOf, allOfGroup, anyOf }
  */
 object Roles {
 
-  sealed trait Role extends be.objectify.deadbolt.scala.models.Role {
+  trait Role extends be.objectify.deadbolt.scala.models.Role {
     def group: RoleGroups = allOfGroup(this.name)
   }
 

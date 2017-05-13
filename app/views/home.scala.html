@@ -16,12 +16,6 @@
         </div>
         <div class="row data">
             <div class="col-md-12">
-                @*<div class="row">*@
-                @*<p class="col-md-6"><strong>@Messages("first.name"):</strong></p><p class="col-md-6">@user.firstName.getOrElse("None")</p>*@
-                @*</div>*@
-                @*<div class="row">*@
-                @*<p class="col-md-6"><strong>@Messages("last.name"):</strong></p><p class="col-md-6">@user.lastName.getOrElse("None")</p>*@
-                @*</div>*@
                 <div class="row">
                     <p class="col-md-6"><strong>@Messages("full.name"):</strong></p><p class="col-md-6">@user.nickname</p>
                 </div>
@@ -42,6 +36,11 @@
                         <p class="col-md-6"><strong>Superuser:</strong></p><p class="col-md-6">no</p>
                     </div>
                 }
+                <div class="row">
+                    <p class="col-md-6"><strong>
+                        Activated:</strong></p><p class="col-md-6">@if(user.activated) {yes} else {no}</p>
+                </div>
+
             </div>
         </div>
     </div>
