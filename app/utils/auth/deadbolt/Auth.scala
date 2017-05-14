@@ -1,28 +1,23 @@
 package utils.auth.deadbolt
 
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 
-import be.objectify.deadbolt.scala.{ AuthenticatedRequest, DeadboltActions, DeadboltHandler }
+import be.objectify.deadbolt.scala.DeadboltActions
 import com.mohiva.play.silhouette.api.Silhouette
-import com.mohiva.play.silhouette.api.actions.SecuredRequest
 import models.Roles
-import play.api.mvc.{ BodyParser, BodyParsers, Result, Results }
+import play.api.mvc.{BodyParser, BodyParsers, Result, Results}
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
 
 /**
- * Provides actions that ensure authentication through Silhouette and authorization through Deadbolt
- *
- * @author Henrik Drefs
- */
+  * Provides actions that ensure authentication through Silhouette and authorization through Deadbolt
+  *
+  * @author Henrik Drefs
+  */
 @Singleton
-class Auth @Inject() (deadboltActions: DeadboltActions, silhouette: Silhouette[DefaultEnv])
+class Auth @Inject()(deadboltActions: DeadboltActions, silhouette: Silhouette[DefaultEnv])
   extends Results with BodyParsers {
-
-  class SecureRequest[B](request: SecuredRequest[DefaultEnv, B]) extends AuthenticatedRequest[B](request, Some(request.identity)) {
-    val identity = request.identity
-  }
 
   def SubjectPresent[B](parser: BodyParser[B] = parse.anyContent)(block: SecureRequest[B] => Future[Result]) =
     silhouette.SecuredAction.async(parser) { implicit req =>

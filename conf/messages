@@ -24,6 +24,7 @@ success = Success!
 home = Home
 first.name = First name
 last.name = Last name
+nickname = Nickname
 full.name = Full name
 email = Email
 password = Password

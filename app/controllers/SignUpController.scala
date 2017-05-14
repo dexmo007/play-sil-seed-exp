@@ -81,7 +81,7 @@ class SignUpController @Inject() (
             val user = HQUser(
               userID = UUID.randomUUID(),
               loginInfo = loginInfo,
-              nickname = data.firstName,
+              nickname = data.nickname,
               email = data.email,
               avatarURL = None,
               activated = false,

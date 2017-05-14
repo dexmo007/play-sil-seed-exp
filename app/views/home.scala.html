@@ -1,26 +1,28 @@
 @import be.objectify.deadbolt.scala.views.html.subjectPresent
 @import be.objectify.deadbolt.scala.views.html.restrictOr
-@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@import utils.auth.deadbolt.SecureRequest
 
-@(user: models.HQUser)(implicit request: AuthenticatedRequest[Any], messages: Messages, webJarAssets: WebJarAssets)
+@()(implicit request: SecureRequest[Any], messages: Messages, webJarAssets: WebJarAssets)
 
-@main(Messages("home.title"), Some(user)) {
+@main(Messages("home.title"), Some(request.identity)) {
     <div class="user col-md-6 col-md-offset-3">
         <div class="row">
             <hr class="col-md-12" />
             <h4 class="col-md-8">@Messages("welcome.signed.in")</h4>
             <div class="col-md-4 text-right">
-                <img src="@user.avatarURL.getOrElse(routes.Assets.at("images/silhouette.png"))" height="40px" />
+                <img src="@request.identity.avatarURL.getOrElse(routes.Assets.at("images/silhouette.png"))" height="40px" />
             </div>
             <hr class="col-md-12" />
         </div>
         <div class="row data">
             <div class="col-md-12">
                 <div class="row">
-                    <p class="col-md-6"><strong>@Messages("full.name"):</strong></p><p class="col-md-6">@user.nickname</p>
+                    <p class="col-md-6"><strong>@Messages("full.name")
+                        :</strong></p><p class="col-md-6">@request.identity.nickname</p>
                 </div>
                 <div class="row">
-                    <p class="col-md-6"><strong>@Messages("email"):</strong></p><p class="col-md-6">@user.email</p>
+                    <p class="col-md-6"><strong>@Messages("email")
+                        :</strong></p><p class="col-md-6">@request.identity.email</p>
                 </div>
                 @subjectPresent() {
                     <div class="row">
@@ -36,10 +38,6 @@
                         <p class="col-md-6"><strong>Superuser:</strong></p><p class="col-md-6">no</p>
                     </div>
                 }
-                <div class="row">
-                    <p class="col-md-6"><strong>
-                        Activated:</strong></p><p class="col-md-6">@if(user.activated) {yes} else {no}</p>
-                </div>
 
             </div>
         </div>
